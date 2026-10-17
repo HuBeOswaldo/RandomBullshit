@@ -25,7 +25,7 @@ respond to community requests and aim to make the game a better experience.
 
 ### T.W.I.G.
 
-![T.W.I.G. training dummy](https://raw.githubusercontent.com/HuBeOswaldo/RandomBullshit/main/images/twig.png)
+![T.W.I.G. training dummy](https://raw.githubusercontent.com/HuBeOswaldo/RandomBullshit/main/images/twig-example.jpg)
 
 ### T.W.M.
 
