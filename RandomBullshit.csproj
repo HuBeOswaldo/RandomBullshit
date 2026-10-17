@@ -1,0 +1,69 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net462</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>RandomBullshit</AssemblyName>
+    <RootNamespace>RandomBullshit</RootNamespace>
+    <ValheimDir Condition="'$(ValheimDir)' == '' and '$(VALHEIM_INSTALL)' != ''">$(VALHEIM_INSTALL)</ValheimDir>
+    <ValheimDir Condition="'$(ValheimDir)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Valheim</ValheimDir>
+    <ModProfileDir Condition="'$(ModProfileDir)' == '' and '$(THUNDERSTORE_PROFILE_DIR)' != ''">$(THUNDERSTORE_PROFILE_DIR)</ModProfileDir>
+    <ModProfileDir Condition="'$(ModProfileDir)' == ''">C:\Users\oswal\AppData\Roaming\Thunderstore Mod Manager\DataFolder\Valheim\profiles\MyTest</ModProfileDir>
+    <ValheimManagedDir>$(ValheimDir)\valheim_Data\Managed</ValheimManagedDir>
+    <BepInExCoreDir Condition="'$(ModProfileDir)' == ''">$(ValheimDir)\BepInEx\core</BepInExCoreDir>
+    <BepInExCoreDir Condition="'$(ModProfileDir)' != ''">$(ModProfileDir)\BepInEx\core</BepInExCoreDir>
+    <JotunnDir Condition="'$(ModProfileDir)' == ''">$(ValheimDir)\BepInEx\plugins\Jotunn</JotunnDir>
+    <JotunnDir Condition="'$(ModProfileDir)' != ''">$(ModProfileDir)\BepInEx\plugins\ValheimModding-Jotunn</JotunnDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="assembly_valheim">
+      <HintPath>$(ValheimManagedDir)\assembly_valheim.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BepInEx">
+      <HintPath>$(BepInExCoreDir)\BepInEx.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(BepInExCoreDir)\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Jotunn">
+      <HintPath>$(JotunnDir)\Jotunn.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(ValheimManagedDir)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <HintPath>$(ValheimManagedDir)\UnityEngine.AssetBundleModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>$(ValheimManagedDir)\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(ValheimManagedDir)\UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(ValheimManagedDir)\UnityEngine.UI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="gui_framework">
+      <HintPath>$(ValheimManagedDir)\gui_framework.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>$(ValheimManagedDir)\Unity.TextMeshPro.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="DeployToModProfile" AfterTargets="Build" Condition="'$(ModProfileDir)' != ''">
+    <MakeDir Directories="$(ModProfileDir)\BepInEx\plugins\RandomBullshit" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModProfileDir)\BepInEx\plugins\RandomBullshit" SkipUnchangedFiles="true" />
+  </Target>
+</Project>
