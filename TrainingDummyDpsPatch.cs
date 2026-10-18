@@ -186,18 +186,49 @@ internal static class TrainingDummyCharacterDpsPatch
             return;
         }
 
-        var display = __instance.GetComponent<TrainingDummyDpsDisplay>();
-        if (display == null)
-        {
-            display = __instance.gameObject.AddComponent<TrainingDummyDpsDisplay>();
-        }
-
-        display.RecordDamage(damage);
+        RecordDamage(__instance, damage);
 
         var regeneration = __instance.GetComponent<TrainingDummyRegeneration>();
         if (regeneration != null)
         {
             regeneration.RecordDamage();
+        }
+    }
+
+    internal static void RecordDamage(Character character, float damage)
+    {
+        var display = character.GetComponent<TrainingDummyDpsDisplay>();
+        if (display == null)
+        {
+            display = character.gameObject.AddComponent<TrainingDummyDpsDisplay>();
+        }
+
+        display.RecordDamage(damage);
+    }
+}
+
+[HarmonyPatch(typeof(Character), "Damage", new Type[] { typeof(HitData) })]
+internal static class TrainingDummyLocalAttackerDpsPatch
+{
+    private static void Prefix(Character __instance, HitData __0)
+    {
+        if (!TrainingDummyDpsDisplayPatch.IsTrainingDummy(__instance)
+            || Player.m_localPlayer == null
+            || __0.GetAttacker() != Player.m_localPlayer)
+        {
+            return;
+        }
+
+        var networkView = __instance.GetComponent<ZNetView>();
+        if (networkView == null || networkView.IsOwner())
+        {
+            return;
+        }
+
+        var damage = __0.GetTotalDamage();
+        if (damage > 0f)
+        {
+            TrainingDummyCharacterDpsPatch.RecordDamage(__instance, damage);
         }
     }
 }

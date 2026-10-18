@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.0.6
+
+- Fixed multiplayer DPS visibility so each player sees damage from their own
+  attacks on training dummies placed by other players.
+
+## v1.0.5
+
+- Fixed the T.W.I.G. example image format so it renders correctly on the
+  Thunderstore and GitHub mod pages.
+
 ## v1.0.4
 
 - Prevented damage from destroying training dummies or dropping their build

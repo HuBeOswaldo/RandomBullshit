@@ -13,7 +13,8 @@ respond to community requests and aim to make the game a better experience.
 
 - T.W.I.G. and TWM (Training with Mexicanito) training dummies display a
   compact damage-per-second number above them, calculated over a rolling
-  5-second window.
+  5-second window. Each attacker sees their own damage locally, including when
+  hitting a dummy placed by another player.
 - TWM is a passive training dummy available in the hammer build menu.
 - T.W.I.G. and T.W.M. cannot be destroyed and regenerate to full health after
   5 seconds without damage; damage does not drop their build materials.

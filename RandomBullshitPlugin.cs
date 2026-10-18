@@ -12,7 +12,7 @@ public sealed class RandomBullshitPlugin : BaseUnityPlugin
 {
     public const string PluginGuid = "com.randombullshit.mod";
     public const string PluginName = "RandomBullshit";
-    public const string PluginVersion = "1.0.4";
+    public const string PluginVersion = "1.0.6";
 
     internal static RandomBullshitPlugin Instance { get; private set; }
 
