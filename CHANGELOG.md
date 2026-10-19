@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.0.7
+
+- Fixed local DPS text updates for multiplayer hits by observing outgoing
+  training-dummy damage RPCs on the attacking player's client.
+- Kept DPS sampling hits that continue after dummy health reaches its 1 HP
+  floor, where health-difference-based sampling stopped registering damage.
+- Increased both training dummies to 500,000 health for extended training
+  sessions.
+
 ## v1.0.6
 
 - Fixed multiplayer DPS visibility so each player sees damage from their own

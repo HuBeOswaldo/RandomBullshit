@@ -5,6 +5,43 @@ using UnityEngine;
 
 namespace RandomBullshit;
 
+internal static class TrainingDummySettings
+{
+    internal const float MaxHealth = 500000f;
+}
+
+[HarmonyPatch(typeof(Character), "Awake")]
+internal static class TrainingDummyHealthPatch
+{
+    private static void Prefix(Character __instance)
+    {
+        if (TrainingDummyDpsDisplayPatch.IsTrainingDummy(__instance))
+        {
+            __instance.m_health = TrainingDummySettings.MaxHealth;
+        }
+    }
+
+    private static void Postfix(Character __instance)
+    {
+        if (!TrainingDummyDpsDisplayPatch.IsTrainingDummy(__instance))
+        {
+            return;
+        }
+
+        var networkView = __instance.GetComponent<ZNetView>();
+        if (networkView == null || !networkView.IsValid() || !networkView.IsOwner())
+        {
+            return;
+        }
+
+        if (__instance.GetMaxHealth() < TrainingDummySettings.MaxHealth)
+        {
+            __instance.SetMaxHealth(TrainingDummySettings.MaxHealth);
+            __instance.SetHealth(TrainingDummySettings.MaxHealth);
+        }
+    }
+}
+
 [HarmonyPatch(typeof(Character), "Start")]
 internal static class TrainingDummyDpsDisplayPatch
 {
@@ -173,7 +210,7 @@ internal static class TrainingDummyCharacterDpsPatch
         return true;
     }
 
-    private static void Postfix(Character __instance, float __state)
+    private static void Postfix(Character __instance, HitData __1, float __state)
     {
         if (float.IsNaN(__state))
         {
@@ -181,6 +218,11 @@ internal static class TrainingDummyCharacterDpsPatch
         }
 
         var damage = __state - __instance.GetHealth();
+        if (damage <= 0f && __1 != null)
+        {
+            damage = __1.GetTotalDamage();
+        }
+
         if (damage <= 0f)
         {
             return;
@@ -207,28 +249,33 @@ internal static class TrainingDummyCharacterDpsPatch
     }
 }
 
-[HarmonyPatch(typeof(Character), "Damage", new Type[] { typeof(HitData) })]
-internal static class TrainingDummyLocalAttackerDpsPatch
+[HarmonyPatch(typeof(ZNetView), "InvokeRPC", new Type[] { typeof(string), typeof(object[]) })]
+internal static class TrainingDummyLocalDamageRpcPatch
 {
-    private static void Prefix(Character __instance, HitData __0)
+    private static void Postfix(ZNetView __instance, string __0, object[] __1)
     {
-        if (!TrainingDummyDpsDisplayPatch.IsTrainingDummy(__instance)
+        if (!string.Equals(__0, "RPC_Damage", StringComparison.Ordinal)
+            || __1 == null
+            || __1.Length == 0)
+        {
+            return;
+        }
+
+        var character = __instance.GetComponent<Character>();
+        if (character == null
+            || !TrainingDummyDpsDisplayPatch.IsTrainingDummy(character)
+            || __instance.IsOwner()
             || Player.m_localPlayer == null
-            || __0.GetAttacker() != Player.m_localPlayer)
+            || !(__1[0] is HitData hitData)
+            || hitData.m_attacker != Player.m_localPlayer.GetZDOID())
         {
             return;
         }
 
-        var networkView = __instance.GetComponent<ZNetView>();
-        if (networkView == null || networkView.IsOwner())
-        {
-            return;
-        }
-
-        var damage = __0.GetTotalDamage();
+        var damage = hitData.GetTotalDamage();
         if (damage > 0f)
         {
-            TrainingDummyCharacterDpsPatch.RecordDamage(__instance, damage);
+            TrainingDummyCharacterDpsPatch.RecordDamage(character, damage);
         }
     }
 }

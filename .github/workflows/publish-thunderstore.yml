@@ -1,0 +1,41 @@
+name: Publish to Thunderstore
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate package and publishing configuration
+        id: release
+        env:
+          THUNDERSTORE_API_KEY: ${{ secrets.THUNDERSTORE_API_KEY }}
+          THUNDERSTORE_NAMESPACE: ${{ vars.THUNDERSTORE_NAMESPACE }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          package="RandomBullshit-${version}.zip"
+          test -n "$THUNDERSTORE_API_KEY" || { echo "::error::Configure the THUNDERSTORE_API_KEY repository secret."; exit 1; }
+          test -n "$THUNDERSTORE_NAMESPACE" || { echo "::error::Configure the THUNDERSTORE_NAMESPACE repository variable."; exit 1; }
+          test -f "$package" || { echo "::error::Release package not found: $package"; exit 1; }
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "package=$package" >> "$GITHUB_OUTPUT"
+
+      - uses: GreenTF/upload-thunderstore-package@v4.3
+        with:
+          namespace: ${{ vars.THUNDERSTORE_NAMESPACE }}
+          community: valheim
+          name: RandomBullshit
+          version: ${{ steps.release.outputs.version }}
+          description: A community-focused Valheim mod built around player requests to improve the game experience.
+          token: ${{ secrets.THUNDERSTORE_API_KEY }}
+          file: ${{ steps.release.outputs.package }}
+          repo: valheim.thunderstore.io
